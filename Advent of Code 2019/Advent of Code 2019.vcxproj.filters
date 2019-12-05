@@ -30,6 +30,9 @@
     <ClCompile Include="day4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="day5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="day1.h">
@@ -44,6 +47,9 @@
     <ClInclude Include="day4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="day5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input_day1.txt">
@@ -56,6 +62,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="D2P2-RealisticBigBoy.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="input_day5.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
