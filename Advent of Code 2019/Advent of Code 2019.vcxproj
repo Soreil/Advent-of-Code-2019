@@ -132,6 +132,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,6 +154,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -161,6 +165,7 @@
     <ClCompile Include="day3.cpp" />
     <ClCompile Include="day4.cpp" />
     <ClCompile Include="day5.cpp" />
+    <ClCompile Include="day6.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="day1.h" />
@@ -168,13 +173,16 @@
     <ClInclude Include="day3.h" />
     <ClInclude Include="day4.h" />
     <ClInclude Include="day5.h" />
+    <ClInclude Include="day6.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="bigboyinput_day1.txt" />
     <Text Include="D2P2-RealisticBigBoy.txt" />
     <Text Include="D2P2-VeryBigBoy.txt" />
+    <Text Include="day6.txt" />
     <Text Include="input_day1.txt" />
     <Text Include="input_day5.txt" />
+    <Text Include="sample_day6.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

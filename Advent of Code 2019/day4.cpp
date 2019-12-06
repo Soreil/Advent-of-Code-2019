@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-int main() {
+void day4() {
 	auto const lower = 134792;
 	auto const upper = 675810;
 
