@@ -32,8 +32,8 @@ enum class parameterMode {
 
 class intComputer {
 private:
-	std::deque<int> inputBuffer{ 1 };
-	std::deque<int> output;
+	std::deque<int> IObuffer;
+	std::deque<int> outputQueue;
 	std::vector<int> instructions;
 
 	std::map<opCodeID, size_t> const length{
@@ -60,12 +60,12 @@ private:
 	}
 
 	auto read() -> int {
-		auto out = inputBuffer.front();
-		inputBuffer.pop_front();
+		auto out = IObuffer.front();
+		IObuffer.pop_front();
 		return out;
 	}
 
-	auto write(int val) -> void { output.emplace_back(val); }
+	auto write(int val) -> void { outputQueue.emplace_back(val); }
 
 	auto apply(opCodeID op, std::vector<parameterMode> mode,
 		std::vector<int> param) -> std::optional<int> {
@@ -182,7 +182,7 @@ private:
 	}
 
 public:
-	int compute() {
+	std::pair<int, bool> compute() {
 		for (auto current = instructions.begin(); current < instructions.end();
 			) {
 			auto [op, flags] = decodeOpcode(*current);
@@ -191,21 +191,30 @@ public:
 				current++;
 				params[i] = *current;
 			}
-			if (op == opCodeID::halt) break;
+			if (op == opCodeID::halt) {
+				return { outputQueue.back(), true };
+			}
+
 			if (auto offset = apply(op, flags, params); offset != std::nullopt)
 				current = instructions.begin() + size_t(offset.value());
 			else
-					current++;
+				current++;
 			// for (auto i = instructions.begin(); i < instructions.end(); i++)
 			//  std::cout << *i << '\n';
 		}
 		// for (auto i = output.begin(); i < output.end(); i++) std::cout << *i <<
 		// '\n';
-		if (output.size() > 0)
-			return output.back();
+		if (outputQueue.size() > 0)
+			return { outputQueue.back(),false };
 		else
-			return 0;
+			return { 0,false };
 	}
+
+	void addInput(int n) {
+		IObuffer.emplace_back(n);
+	}
+
+	intComputer(std::vector<int> code, std::vector<int> input) :instructions(code), IObuffer(input.begin(), input.end()) {}
 	intComputer(std::vector<int> code) :instructions(code) {}
 };
 
@@ -226,6 +235,71 @@ void day5() {
 		instructions[i] = std::stoi(words[i]);
 	}
 
-	intComputer comp(instructions);
-	std::cout << comp.compute() << '\n';
+	intComputer comp(instructions, { 1 });
+	std::cout << comp.compute().first << '\n';
+}
+
+void day7() {
+	auto fileName = "sample_day7.txt";
+	std::ifstream file(fileName);
+	const auto fileSize = std::filesystem::file_size(fileName);
+	auto buf = new char[fileSize];
+	file.read(buf, fileSize);
+
+	auto input = std::string(buf);
+
+	std::vector<std::string> words;
+	split(words, input, is_any_of(","));
+
+	std::vector<int> instructions(words.size());
+	for (size_t i = 0; i < words.size(); i++) {
+		instructions[i] = std::stoi(words[i]);
+	}
+
+	auto maxSignal = [&instructions](std::vector<int> phases) -> int {
+		int computerInput = 0;
+
+		for (auto x : phases) {
+			intComputer comp(instructions, { x,computerInput });
+			computerInput = comp.compute().first;
+
+		}
+		return computerInput;
+	};
+
+	auto maxSignalWithFeedback = [&instructions](std::vector<int> phases) -> int {
+		int computerInput = 0;
+
+		std::vector<intComputer> amplifiers;
+		for (auto x : phases) {
+			amplifiers.emplace_back(intComputer(instructions, { x }));
+			auto out = amplifiers.back().compute().first;
+			std::cout << out << '\n';
+			computerInput = out;
+		}
+
+		while (true) {
+			for (auto& comp : amplifiers) {
+				comp.addInput(computerInput);
+				auto [res, halted] = comp.compute();
+				if (halted)
+					return res;
+				std::cout << res << '\n';
+				computerInput = res;
+			}
+		}
+		return computerInput;
+	};
+
+	//auto amplifier_settings = std::vector{ 0,1,2,3,4 };
+	//auto max = 0;
+	//do {
+	//	//std::cout << maxSignal(amplifier_settings) << '\n';
+	//	if (auto out = maxSignal(amplifier_settings); out > max)
+	//		max = out;
+	//} while (std::next_permutation(amplifier_settings.begin(), amplifier_settings.end()));
+	//std::cout << max << '\n';
+
+	auto amplifier_settings = std::vector{ 9,7,8,5,6 };
+	std::cout << maxSignalWithFeedback(amplifier_settings) << '\n';
 }
