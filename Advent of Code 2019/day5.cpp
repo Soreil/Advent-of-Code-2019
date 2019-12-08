@@ -6,6 +6,8 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
+#include <mutex>
+#include <thread>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -32,9 +34,11 @@ enum class parameterMode {
 
 class intComputer {
 private:
-	std::deque<int> IObuffer;
-	std::deque<int> outputQueue;
 	std::vector<int> instructions;
+	int lastOutput = 0;
+
+	std::vector<int>::iterator storedIP;
+	std::deque<int> temp_input;
 
 	std::map<opCodeID, size_t> const length{
 		{opCodeID::halt, 0},      {opCodeID::plus, 3},
@@ -60,15 +64,13 @@ private:
 	}
 
 	auto read() -> int {
-		auto out = IObuffer.front();
-		IObuffer.pop_front();
-		return out;
+		auto val = temp_input.front();
+		temp_input.pop_front();
+		return val;
 	}
 
-	auto write(int val) -> void { outputQueue.emplace_back(val); }
-
 	auto apply(opCodeID op, std::vector<parameterMode> mode,
-		std::vector<int> param) -> std::optional<int> {
+		std::vector<int> param) -> std::pair<std::optional<int>, std::optional<int>> {
 		using namespace std::placeholders;
 
 		auto readArguments = [&mode, &param, this](size_t n) -> std::vector<int> {
@@ -140,14 +142,14 @@ private:
 		case opCodeID::jumpFalse: {
 			auto args = readArguments(length.at(op));
 
-			if (args[0] == 0) return args[1];
+			if (args[0] == 0) return { args[1],std::nullopt };
 			break;
 		}
 
 		case opCodeID::jumpTrue: {
 			auto args = readArguments(length.at(op));
 
-			if (args[0] != 0) return args[1];
+			if (args[0] != 0) return { args[1],std::nullopt };
 			break;
 		}
 
@@ -164,8 +166,7 @@ private:
 			else if (mode[0] == parameterMode::position)
 				value = instructions[size_t(param[0])];
 
-			write(value);
-			break;
+			return { std::nullopt,value };
 		}
 		case opCodeID::outputScreen: {
 			int value = 0;
@@ -178,12 +179,13 @@ private:
 			break;
 		}
 		};
-		return std::nullopt;
+		return { std::nullopt,std::nullopt };
 	}
 
 public:
-	std::pair<int, bool> compute() {
-		for (auto current = instructions.begin(); current < instructions.end();
+	std::pair<int, bool> compute(int nextIn) {
+		temp_input.emplace_back(nextIn);
+		for (auto current = storedIP; current < instructions.end();
 			) {
 			auto [op, flags] = decodeOpcode(*current);
 			std::vector<int> params(flags.size());
@@ -192,11 +194,16 @@ public:
 				params[i] = *current;
 			}
 			if (op == opCodeID::halt) {
-				return { outputQueue.back(), true };
+				return { temp_input.front(), true };
 			}
 
-			if (auto offset = apply(op, flags, params); offset != std::nullopt)
+			if (auto [offset, ret] = apply(op, flags, params); offset != std::nullopt)
 				current = instructions.begin() + size_t(offset.value());
+			else if (ret != std::nullopt) {
+				current++;
+				storedIP = current;
+				return { ret.value(),false };
+			}
 			else
 				current++;
 			// for (auto i = instructions.begin(); i < instructions.end(); i++)
@@ -204,43 +211,15 @@ public:
 		}
 		// for (auto i = output.begin(); i < output.end(); i++) std::cout << *i <<
 		// '\n';
-		if (outputQueue.size() > 0)
-			return { outputQueue.back(),false };
-		else
-			return { 0,false };
+		return { lastOutput, false };
 	}
 
-	void addInput(int n) {
-		IObuffer.emplace_back(n);
-	}
-
-	intComputer(std::vector<int> code, std::vector<int> input) :instructions(code), IObuffer(input.begin(), input.end()) {}
-	intComputer(std::vector<int> code) :instructions(code) {}
+	intComputer(std::vector<int> code, int phase) :
+		instructions(code), storedIP(instructions.begin()), temp_input{ phase } {}
 };
 
-void day5() {
-	auto fileName = "input_ascii_day5.txt";
-	std::ifstream file(fileName);
-	const auto fileSize = std::filesystem::file_size(fileName);
-	auto buf = new char[fileSize];
-	file.read(buf, fileSize);
-
-	auto input = std::string(buf);
-
-	std::vector<std::string> words;
-	split(words, input, is_any_of(","));
-
-	std::vector<int> instructions(words.size());
-	for (size_t i = 0; i < words.size(); i++) {
-		instructions[i] = std::stoi(words[i]);
-	}
-
-	intComputer comp(instructions, { 1 });
-	std::cout << comp.compute().first << '\n';
-}
-
 void day7() {
-	auto fileName = "sample_day7.txt";
+	auto fileName = "input_day7.txt";
 	std::ifstream file(fileName);
 	const auto fileSize = std::filesystem::file_size(fileName);
 	auto buf = new char[fileSize];
@@ -255,51 +234,54 @@ void day7() {
 	for (size_t i = 0; i < words.size(); i++) {
 		instructions[i] = std::stoi(words[i]);
 	}
-
-	auto maxSignal = [&instructions](std::vector<int> phases) -> int {
-		int computerInput = 0;
-
-		for (auto x : phases) {
-			intComputer comp(instructions, { x,computerInput });
-			computerInput = comp.compute().first;
-
-		}
-		return computerInput;
-	};
 
 	auto maxSignalWithFeedback = [&instructions](std::vector<int> phases) -> int {
 		int computerInput = 0;
 
-		std::vector<intComputer> amplifiers;
-		for (auto x : phases) {
-			amplifiers.emplace_back(intComputer(instructions, { x }));
-			auto out = amplifiers.back().compute().first;
-			std::cout << out << '\n';
-			computerInput = out;
-		}
+		auto first = intComputer(instructions, phases[0]);
+		computerInput = first.compute(computerInput).first;
+		auto second = intComputer(instructions, phases[1]);
+		computerInput = second.compute(computerInput).first;
+		auto third = intComputer(instructions, phases[2]);
+		computerInput = third.compute(computerInput).first;
+		auto fourth = intComputer(instructions, phases[3]);
+		computerInput = fourth.compute(computerInput).first;
+		auto fifth = intComputer(instructions, phases[4]);
+		computerInput = fifth.compute(computerInput).first;
 
 		while (true) {
-			for (auto& comp : amplifiers) {
-				comp.addInput(computerInput);
-				auto [res, halted] = comp.compute();
-				if (halted)
-					return res;
-				std::cout << res << '\n';
-				computerInput = res;
+			{
+				auto [val, done] = first.compute(computerInput);
+				computerInput = val;
 			}
+			{
+				auto [val, done] = second.compute(computerInput);
+				computerInput = val;
+			}
+			{
+				auto [val, done] = third.compute(computerInput);
+				computerInput = val;
+			}
+			{
+				auto [val, done] = fourth.compute(computerInput);
+				computerInput = val;
+			}
+			{
+				auto [val, done] = fifth.compute(computerInput);
+				if (done)
+					return val;
+				else computerInput = val;
+			}
+
 		}
 		return computerInput;
 	};
 
-	//auto amplifier_settings = std::vector{ 0,1,2,3,4 };
-	//auto max = 0;
-	//do {
-	//	//std::cout << maxSignal(amplifier_settings) << '\n';
-	//	if (auto out = maxSignal(amplifier_settings); out > max)
-	//		max = out;
-	//} while (std::next_permutation(amplifier_settings.begin(), amplifier_settings.end()));
-	//std::cout << max << '\n';
+	auto amplifier_settings = std::vector{ 5,6,7,8,9 };
+	auto vals = std::vector<int>();
+	do {
+		vals.emplace_back(maxSignalWithFeedback(amplifier_settings));
+	} while (std::next_permutation(amplifier_settings.begin(), amplifier_settings.end()));
 
-	auto amplifier_settings = std::vector{ 9,7,8,5,6 };
-	std::cout << maxSignalWithFeedback(amplifier_settings) << '\n';
+	std::cout << *std::max_element(vals.begin(),vals.end()) << '\n';
 }

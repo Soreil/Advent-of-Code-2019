@@ -74,24 +74,33 @@ auto hasKey(planet const& p, std::string const& key) -> bool {
 auto hasBoth(planet const& p) -> bool {
 	return hasKey(p, std::string("YOU")) && hasKey(p, std::string("SAN"));
 }
+auto hasEither(planet const& p) -> bool {
+	return hasKey(p, std::string("YOU")) || hasKey(p, std::string("SAN"));
+}
 
-auto distance(planet const& p, size_t depth = 1) -> size_t {
-	if (!hasBoth(p))
+auto distance(planet const& p, size_t depth = 0) -> size_t {
+	if (!hasEither(p))
 		return depth;
 	for (auto const& x : p.orbiters) {
 		if (hasBoth(x))
-			return distance(x, depth + 1);
+			return distance(x);
 	}
 	//We hit the last common element, now what?
-	return 0;
+	size_t sum = depth;
+	for (auto const& x : p.orbiters) {
+		if (hasEither(x))
+			sum += distance(x, 1);
+
+	}
+	return sum;
 }
 
 void day6() {
-	auto fileName = "sample_day6.txt";
+	auto fileName = "day6.txt";
 	std::ifstream file(fileName);
 	const auto fileSize = std::filesystem::file_size(fileName);
 
-	auto input = std::string(size_t(fileSize),'\0');
+	auto input = std::string(size_t(fileSize), '\0');
 	file.read(input.data(), input.size());
 	auto read = file.gcount();
 	input.resize(read);
@@ -120,6 +129,5 @@ void day6() {
 
 	std::cout << sumOfDepth(localUniverse.back()) << '\n';
 
-	std::cout << distance(localUniverse.back()) << '\n';
-	std::cout << hasBoth(localUniverse.back()) << '\n';
+	std::cout << distance(localUniverse.back()) - 2 << '\n';
 };
