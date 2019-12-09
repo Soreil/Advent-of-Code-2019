@@ -167,6 +167,8 @@
     <ClCompile Include="day5.cpp" />
     <ClCompile Include="day6.cpp" />
     <ClCompile Include="day8.cpp" />
+    <ClCompile Include="day9.cpp" />
+    <ClCompile Include="intcomputer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="day1.h" />
@@ -176,6 +178,8 @@
     <ClInclude Include="day5.h" />
     <ClInclude Include="day6.h" />
     <ClInclude Include="day8.h" />
+    <ClInclude Include="day9.h" />
+    <ClInclude Include="intcomputer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="bigboyinput_day1.txt" />
@@ -185,6 +189,7 @@
     <Text Include="input_day1.txt" />
     <Text Include="input_day5.txt" />
     <Text Include="input_day7.txt" />
+    <Text Include="input_day9.txt" />
     <Text Include="sample_day6.txt" />
     <Text Include="sample_day7.txt" />
   </ItemGroup>
