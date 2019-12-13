@@ -18,66 +18,18 @@
     <ClCompile Include="Advent of Code 2019.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="day1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day5.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day6.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day8.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="intcomputer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="day9.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="day10.cpp">
+    <ClCompile Include="day12.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="day1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day5.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day6.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day8.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="intcomputer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="day9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="day10.h">
+    <ClInclude Include="day12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

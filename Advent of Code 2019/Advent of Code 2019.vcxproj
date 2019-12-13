@@ -160,27 +160,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Advent of Code 2019.cpp" />
-    <ClCompile Include="day1.cpp" />
-    <ClCompile Include="day10.cpp" />
-    <ClCompile Include="day2.cpp" />
-    <ClCompile Include="day3.cpp" />
-    <ClCompile Include="day4.cpp" />
-    <ClCompile Include="day5.cpp" />
-    <ClCompile Include="day6.cpp" />
-    <ClCompile Include="day8.cpp" />
-    <ClCompile Include="day9.cpp" />
+    <ClCompile Include="day12.cpp" />
     <ClCompile Include="intcomputer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="day1.h" />
-    <ClInclude Include="day10.h" />
-    <ClInclude Include="day2.h" />
-    <ClInclude Include="day3.h" />
-    <ClInclude Include="day4.h" />
-    <ClInclude Include="day5.h" />
-    <ClInclude Include="day6.h" />
-    <ClInclude Include="day8.h" />
-    <ClInclude Include="day9.h" />
+    <ClInclude Include="day12.h" />
     <ClInclude Include="intcomputer.h" />
   </ItemGroup>
   <ItemGroup>

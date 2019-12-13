@@ -75,19 +75,19 @@ auto makeNodes(std::vector<section> const& sections) -> std::vector<point> {
 		point previousNode = nodes.back();
 		switch (section.dir) {
 		case direction::up:
-			previousNode.y -= section.length;
+			previousNode.y -= int(section.length);
 			nodes.emplace_back(previousNode);
 			break;
 		case direction::right:
-			previousNode.x += section.length;
+			previousNode.x += int(section.length);
 			nodes.emplace_back(previousNode);
 			break;
 		case direction::down:
-			previousNode.y += section.length;
+			previousNode.y += int(section.length);
 			nodes.emplace_back(previousNode);
 			break;
 		case direction::left:
-			previousNode.x -= section.length;
+			previousNode.x -= int(section.length);
 			nodes.emplace_back(previousNode);
 			break;
 		}

@@ -54,10 +54,10 @@ public:
 			return { std::abs(x1 - x2), std::abs(y1 - y2) };
 		};
 
-		auto mark = [&](int xPos, int yPos) -> bool {
+		auto mark = [&](size_t xPos, size_t yPos) -> bool {
 			if (visited[yPos][xPos]) return false;
 
-			auto d = distance(x, y, xPos, yPos);
+			auto d = distance(x, y, int(xPos), int(yPos));
 			auto gcd = std::gcd(d.first, d.second);
 			// std::cout << xPos << ',' << yPos << ',' << gcd << '\n';
 
@@ -122,13 +122,9 @@ auto atanP(std::pair<double, double> p) -> double {
 
 //Elements are sorted by their angle to origin, starting from zero.
 auto sort(std::vector<std::pair<size_t, size_t>>& targets, std::pair<size_t, size_t> origin) {
-	std::set<double> angles;
-
 	std::sort(targets.begin(), targets.end(), [&](auto lhs, auto rhs) {
 		auto p1 = atanP(distance(origin.first, origin.second, lhs.first, lhs.second));
 		auto p2 = atanP(distance(origin.first, origin.second, rhs.first, rhs.second));
-		angles.insert(p1);
-		angles.insert(p2);
 		return p1 < p2;
 		});
 

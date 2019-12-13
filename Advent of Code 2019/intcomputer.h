@@ -192,8 +192,10 @@ private:
 	}
 
 public:
-	std::pair<T, bool> compute(T nextIn) {
-		temp_input.emplace_back(nextIn);
+	auto addInput(T in) {
+		temp_input.emplace_back(in);
+	}
+	std::pair<T, bool> compute() {
 		for (auto current = storedIP; current < instructions.end();
 			) {
 			auto [op, flags] = decodeOpcode(*current);
