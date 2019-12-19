@@ -3,6 +3,7 @@
 #include <map>
 #include <optional>
 #include <stdexcept>
+#include <functional>
 
 enum class opCodeID {
 	halt = 99,
@@ -54,12 +55,13 @@ private:
 
 		return { opID, modeFlags };
 	}
-	auto read() -> T {
+public:
+	std::function<T()> read = [this]() -> T {
 		auto val = temp_input.front();
 		temp_input.pop_front();
 		return val;
-	}
-
+	};
+private:
 	auto apply(opCodeID op, std::vector<parameterMode> mode,
 		std::vector<T> param) -> std::pair<std::optional<T>, std::optional<T>> {
 
@@ -205,7 +207,7 @@ public:
 				params[i] = *current;
 			}
 			if (op == opCodeID::halt) {
-				return { temp_input.front(), true };
+				return {0, true };
 			}
 
 			if (auto [offset, ret] = apply(op, flags, params); offset != std::nullopt)
